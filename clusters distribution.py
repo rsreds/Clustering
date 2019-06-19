@@ -24,7 +24,7 @@ for file in os.listdir(path):
         continue
 
 
-""" plt.figure()
+plt.figure()
 for i, df in enumerate(dfs):
     plt.plot(df['time_cluster'], df.index)
     slope, intercept = np.polyfit(df['time_cluster'], df.index, 1)
@@ -33,8 +33,7 @@ for i, df in enumerate(dfs):
 plt.xlabel(r'time ($s$)')
 plt.ylabel(r'log lines')
 plt.ticklabel_format(axis='y', style='sci', scilimits=(-2, 2))
-plt.show() """
-
+plt.show()
 
 variances = []
 means = []
