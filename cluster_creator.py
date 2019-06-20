@@ -33,6 +33,7 @@ def clean_log(log):
     log = re.sub(PATH, 'PATH', log)
     log = re.sub(IP, 'IP', log)
     log = re.sub(MAIL, 'MAIL', log)
+    log = log.strip(',')
     return log
 
 
