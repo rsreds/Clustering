@@ -11,18 +11,19 @@ def run():
     Save the resulting .csv on the outputfile, with cluster column indicating the corrisponding cluster for each log
     Plots the cluster size bar graoh
     '''
-    inputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\storm-be\\'
-    outputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\output\\storm-be\\'
+    inputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\storm-fe\\'
+    outputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\output\\sample\\'
 
-    thresholds = [0.5, 0.6, 0.65, 0.7, 0.80]
-    filelist = ['2019-05-25-storm-backend.log.csv.zip']
+    threshold = 0.7
+    repetition = 3
+    filelist = ['storm-frontend-server.log-20181202.csv.zip']
     for filename in filelist:
-        for threshold in thresholds:
+        for i in range(repetition):
             # Load csv
-            print('Loading: ' + filename)
+            print('Loading sample from: ' + filename)
             inputfile = inputpath + filename
-            savename = filename[:-8] + str(threshold)
-            df = pd.read_csv(inputfile, compression='zip')
+            savename = filename[:-8] + '-sample' + str(i)
+            df = pd.read_csv(inputfile, compression='zip').sample(frac=0.9)
             print('Loaded ' + str(len(df.index)) + ' lines')
 
             # run clusterization
