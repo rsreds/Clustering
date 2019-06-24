@@ -9,13 +9,16 @@ def run(inputpath):
                 'cluster_table-storm-frontend-server.log-20181202-sample0.csv',
                 'cluster_table-storm-frontend-server.log-20181202-sample1.csv',
                 'cluster_table-storm-frontend-server.log-20181202-sample2.csv']
+
+    filelist = ['cluster_table-storm-frontend-server.log-201812070.675.csv']
+
     for filename in filelist:
         inputfile = inputpath + filename
-        array = np.loadtxt(inputfile, dtype=("i, i, U50"), delimiter=',')
+        array = np.loadtxt(inputfile, dtype=("i, i, U100"), delimiter=',')
         print(array)
-        plot_clusters(array, False, True, False)
+        plot_clusters(array, write_occ=False, write_ref=True)
 
 
 if __name__ == "__main__":
-    inputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\output\\sample\\'
+    inputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\output\\storm-fe\\20181207\\'
     run(inputpath)

@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
+W = 9.5
+H = W / 1.618
+FIGSIZE = (W, H)
+
 
 def add_value_labels(ax, write_occ, reference_logs):
     '''
@@ -35,7 +39,7 @@ def add_value_labels(ax, write_occ, reference_logs):
             label = reference_logs[id]
             ax.annotate(label, (x_value, y_value), xytext=(0, 5 + vert_spacing*3),
                         textcoords="offset points", ha='center', va=vert_alignment,
-                        rotation=angle, fontsize='xx-small')
+                        rotation=angle, fontsize='xx-small', clip_on=True)
         id = id+1
 
 
@@ -46,16 +50,11 @@ def plot_clusters(cluster_array, write_occ=False,  write_ref=False, skip_single=
 
     Label should be the refernce log for each cluster
     '''
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=FIGSIZE)
     if ordered:
         cluster_array[::-1].sort(order=['f1'], axis=0)
     ids = [row[0] for row in cluster_array]
     occurrence = [row[1] for row in cluster_array]
-
-    if write_ref is True:
-        reference_log = [row[2] for row in cluster_array]
-    else:
-        reference_log = None
 
     if skip_single == True:
         y = occurrence[occurrence > 1]
@@ -65,6 +64,14 @@ def plot_clusters(cluster_array, write_occ=False,  write_ref=False, skip_single=
         x = ids
 
     ax.bar(range(len(x)), y)
+    if write_ref is True:
+        _, top_lim = ax.get_ylim()
+        new_top_lim = 1.5 * top_lim
+        ax.set_ylim(top=new_top_lim)
+        reference_log = [row[2] for row in cluster_array]
+    else:
+        reference_log = None
+
     ax.set_xticks(range(len(x)))
     ax.set_xticklabels(x)
     ax.set_xlabel('cluster')
@@ -74,6 +81,7 @@ def plot_clusters(cluster_array, write_occ=False,  write_ref=False, skip_single=
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+    plt.tight_layout()
     plt.show()
 
     return fig

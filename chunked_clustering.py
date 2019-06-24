@@ -108,3 +108,78 @@ def clusterize(df, sim_thres=DEFAULT_MIN_SIM_THRESHOLD, sim_measure='levenshtein
 
     df.cluster = df.cluster.astype(int)
     return df, clusters
+
+
+def clusterize(chunks, savepath, sim_thres=DEFAULT_MIN_SIM_THRESHOLD, sim_measure='levenshtein'):
+    '''
+    Clusterizes the dataframe based on the similarity of logs to the reference 
+    of each cluster
+    If no cluster within the threshold is found creates new cluster
+
+    Uses normalized Levenshtein distance
+
+    Returns the dataframe and a dicionary of clusters
+    '''
+    t0 = time()
+    clusters = []
+    time_trend = []
+    id = 0
+    for df in chunks:
+        for row in tqdm(df.itertuples()):
+            best_clust = None
+            i = getattr(row, 'Index')
+            datetime = getattr(row, 'datetime')
+            log = getattr(row, 'message')
+            cleaned_log = clean_log(log)
+            t = time()-t0
+            df.at[i, 'time_cluster'] = t
+            if pd.isnull(datetime):
+                cleaned_log = 'JAVA_ERROR'
+            if len(clusters) == 0:
+                clusters.append({'id': id, 'ref': cleaned_log, 'count': 1})
+                df.at[i, 'cluster'] = id
+                df.at[i, 'similarity'] = 1
+                id = id+1
+                continue
+
+            similarities = [similarity(cleaned_log, cluster['ref'], sim_measure)
+                            for cluster in clusters]
+            best_clust = np.argmax(similarities)
+            if similarities[best_clust] > sim_thres:
+                clusters[best_clust]['count'] = clusters[best_clust]['count']+1
+                df.at[i, 'cluster'] = clusters[best_clust]['id']
+                df.at[i, 'similarity'] = similarities[best_clust]
+            else:
+                clusters.append({'id': id, 'ref': cleaned_log, 'count': 1})
+                df.at[i, 'cluster'] = id
+                df.at[i, 'similarity'] = 1
+                id = id+1
+
+        df.cluster = df.cluster.astype(int)
+        if not os.path.isfile(savepath):
+            df.to_csv(savepath)
+        else:  # else it exists so append without writing the header
+            df.to_csv(savepath, mode='a', header=False)
+    return chunks, clusters, time_trend
+
+
+import os
+inputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\storm-be\\'
+outputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\output\\storm-be\\'
+
+filelist = ['2019-05-23-storm-backend.log.csv.zip']
+for filename in filelist:
+    print('Loading: ' + filename)
+    inputfile = inputpath + filename
+    filename = filename[:-8]
+    chunks = pd.read_csv(inputfile, compression='zip', chunksize=500000)
+    print('Loaded chunks')
+
+    chunks, cluster_dict, time_trend = clusterize(
+        chunks, outputpath+'clustered-'+filename, DEFAULT_MIN_SIM_THRESHOLD)
+    print('Clustered. Saved to ' + outputpath)
+
+    array = [[dic['id'], dic['count'], dic['ref']] for dic in cluster_dict]
+    np.savetxt(outputpath + 'cluster_table-' + filename,
+               array, fmt='%s', delimiter=',')
+    print('Saved clusters csv in ' + 'cluster_table-' + filename)

@@ -14,8 +14,8 @@ def run():
     inputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\storm-be\\'
     outputpath = 'C:\\Users\\simor\\Google Drive\\clustering\\output\\storm-be\\'
 
-    thresholds = [0.5, 0.6, 0.65, 0.7, 0.80]
-    filelist = ['2019-05-25-storm-backend.log.csv.zip']
+    thresholds = [0.6, 0.65, 0.7, 0.75, 0.8]
+    filelist = ['2019-05-24-storm-backend.log.csv.zip']
     for filename in filelist:
         for threshold in thresholds:
             # Load csv

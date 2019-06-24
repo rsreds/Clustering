@@ -5,8 +5,12 @@ from math import ceil
 import matplotlib.pyplot as plt
 
 
-path = 'C:/Users/simor/Google Drive/clustering/storm-fe/results-new/'
-filename = 'clustered-storm-frontend-server.log-201812020.7.zip'
+W = 6.5
+H = W / 1.618
+FIGSIZE = (W, H)
+
+path = 'C:/Users/simor/Google Drive/clustering/output/storm-fe/20181207/'
+filename = 'clustered-storm-frontend-server.log-201812070.675.zip'
 
 df = pd.read_csv(path + filename,
                  usecols=['timestamp', 'message',
@@ -25,7 +29,7 @@ for row in df.itertuples():
 x.append(df.last_valid_index())
 y.append(last_max)
 
-
+plt.figure(figsize=FIGSIZE)
 plt.plot(x, y)
 plt.scatter(x[:-1], y[:-1], s=30, marker='.')
 
@@ -36,6 +40,6 @@ plt.ylabel('clusters')
 plt.xticks(np.arange(0, max(x), 250000))
 plt.ticklabel_format(axis='x', style='sci', scilimits=(-2, 2))
 plt.xlabel('log lines')
-
+plt.tight_layout()
 
 plt.show()
